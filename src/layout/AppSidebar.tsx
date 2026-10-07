@@ -14,6 +14,12 @@ import {
   PlugInIcon,
   TableIcon,
   UserCircleIcon,
+  CheckCircleIcon,
+  CallIcon,
+  FilesIcon,
+  TaskIcon,
+
+  CheckLineIcon,
 } from "../icons";
 import { cn } from "../utils";
 import SidebarWidget from "./SidebarWidget";
@@ -68,27 +74,27 @@ const navItems: NavItem[] = [
   //   ],
   // },
   {
-    name: "Today",
+    name: "Work List",
     key: "tables",
-    icon: <TableIcon fontSize={24} />,
+    icon: <TaskIcon fontSize={24} />,
     path: "/basic-tables",
   },
   {
     name: "Validation",
     key: "validation",
-    icon: <UserCircleIcon fontSize={24} />,
+    icon:  <CheckLineIcon  fontSize={24} />,
     path: "/validation",
   },
   {
     name: "Calls",
     key: "calls", 
-    icon: <GridIcon fontSize={24} />,
+    icon: <CallIcon fontSize={24} />,
     path: "/calls",
   },
   {
     name: "Post-Call & Exports",
     key: "exports",
-    icon: <PieChartIcon fontSize={24} />,
+    icon: <GridIcon fontSize={24} />,
     path: "/exports",
   },
   // {
@@ -226,8 +232,8 @@ const AppSidebar: React.FC = () => {
                   : "menu-item-inactive"
               } cursor-pointer ${
                 !isExpanded && !isHovered
-                  ? "xl:justify-center"
-                  : "xl:justify-start"
+                  ? "xl:justify-center xl:px-2"
+                  : "xl:justify-start xl:px-3"
               }`}
             >
               <span
@@ -235,7 +241,7 @@ const AppSidebar: React.FC = () => {
                   openSubmenu?.type === menuType && openSubmenu?.index === index
                     ? "menu-item-icon-active"
                     : "menu-item-icon-inactive"
-                }`}
+                } ${!isExpanded && !isHovered ? "xl:flex xl:justify-center xl:w-full" : ""}`}
               >
                 {nav.icon}
               </span>
@@ -275,6 +281,10 @@ const AppSidebar: React.FC = () => {
                 target={nav.target}
                 className={`group menu-item ${
                   isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
+                } ${
+                  !isExpanded && !isHovered
+                    ? "xl:justify-center xl:px-2"
+                    : "xl:justify-start xl:px-3"
                 }`}
               >
                 <span
@@ -282,7 +292,7 @@ const AppSidebar: React.FC = () => {
                     isActive(nav.path)
                       ? "menu-item-icon-active"
                       : "menu-item-icon-inactive"
-                  }`}
+                  } ${!isExpanded && !isHovered ? "xl:flex xl:justify-center xl:w-full" : ""}`}
                 >
                   {nav.icon}
                 </span>
@@ -365,8 +375,8 @@ const AppSidebar: React.FC = () => {
   return (
     <aside
       className={cn(
-        "fixed inset-s-0 top-0 z-50 flex h-screen flex-col border-e border-purple-700 bg-purple-900 px-5 text-white transition-all duration-300 ease-in-out xl:translate-x-0 xl:rtl:translate-x-0 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-100",
-        isExpanded || isMobileOpen ? "w-[248px]" : "w-16",
+        "fixed inset-s-0 top-0 z-50 flex h-screen flex-col border-e border-purple-700 bg-purple-900 text-white transition-all duration-300 ease-in-out xl:translate-x-0 xl:rtl:translate-x-0 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-100",
+        isExpanded || isMobileOpen ? "w-[248px] px-5" : "w-16 px-1",
         isMobileOpen
           ? "translate-x-0"
           : "-translate-x-full rtl:translate-x-full",

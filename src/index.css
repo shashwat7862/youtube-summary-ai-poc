@@ -215,7 +215,7 @@ html, body, #root {
 }
 
 @utility menu-item-icon {
-  @apply text-purple-200 group-hover:text-white dark:text-gray-400;
+  @apply text-white dark:text-gray-400;
 }
 
 @utility menu-item-icon-active {
@@ -223,7 +223,11 @@ html, body, #root {
 }
 
 @utility menu-item-icon-inactive {
-  @apply text-purple-200 group-hover:text-white dark:text-gray-400 dark:group-hover:text-gray-300;
+  @apply !text-white dark:text-gray-400 dark:group-hover:text-gray-300;
+}
+
+@utility menu-item-icon-size {
+  @apply !text-white dark:!text-gray-400;
 }
 
 @utility menu-item-arrow {
