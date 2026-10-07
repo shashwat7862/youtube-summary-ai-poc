@@ -58,7 +58,7 @@
       "validation": "Validation",
       "calls": "Calls",
       "exports": "Post-Call & Exports",
-      "basicTables": "Basic Tables",
+      "workList": "Work List",
       "dataTables": "Data Tables",
       "pages": "Pages",
       "fileManager": "File Manager",
@@ -144,6 +144,7 @@
     }
   },
   "userDropdown": {
+     "Profile": "Profile",
     "editProfile": "Edit profile",
     "accountSettings": "Account settings",
     "support": "Support",

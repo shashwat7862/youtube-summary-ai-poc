@@ -49,11 +49,11 @@ export default function UserDropdown() {
         onClick={toggleDropdown}
         className="dropdown-toggle flex items-center text-gray-700 dark:text-gray-400"
       >
-        <span className="me-3 h-11 w-11 overflow-hidden rounded-full">
+        {/* <span className="me-3 h-11 w-11 overflow-hidden rounded-full">
           <img src="/images/user/owner.png" alt="User" />
-        </span>
+        </span> */}
 
-        <span className="me-1 block text-theme-sm font-medium">Musharof</span>
+        <span className="me-1 block text-theme-sm font-medium">Shashwat</span>
         <svg
           className={`stroke-gray-500 transition-transform duration-200 dark:stroke-gray-400 ${
             isOpen ? "rotate-180" : ""
@@ -81,10 +81,10 @@ export default function UserDropdown() {
       >
         <div>
           <span className="block text-theme-sm font-medium text-gray-700 no-underline dark:text-gray-400">
-            Musharof Chowdhury
+            Shashwat Gupta
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 no-underline dark:text-gray-400">
-            randomuser@pimjo.com
+            shashwat.gupta1@gehealtcare.com
           </span>
         </div>
 
@@ -111,10 +111,10 @@ export default function UserDropdown() {
                   fill=""
                 />
               </svg>
-              {t("userDropdown.editProfile")}
+              {t("userDropdown.Profile")}
             </DropdownItem>
           </li>
-          <li>
+          {/* <li>
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
@@ -249,7 +249,7 @@ export default function UserDropdown() {
                 </ul>
               </div>
             )}
-          </li>
+          </li> */}
         </ul>
         <Link
           to="/signin"

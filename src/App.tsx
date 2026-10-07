@@ -10,7 +10,7 @@ import Home from "./pages/Dashboard/Ecommerce";
 import FormElements from "./pages/Forms/FormElements";
 import Blank from "./pages/OtherPage/Blank";
 import NotFound from "./pages/OtherPage/NotFound";
-import BasicTables from "./pages/Tables/BasicTables";
+import WorkList from "./pages/WorkList/WorkList";
 import Validation from "./pages/Validation/Validation";
 import Calls from "./pages/Calls/Calls";
 import Exports from "./pages/Exports/Exports";
@@ -41,7 +41,7 @@ export default function App() {
             <Route path="/form-elements" element={<FormElements />} />
 
             {/* Tables */}
-            <Route path="/basic-tables" element={<BasicTables />} />
+            <Route path="/work-list" element={<WorkList />} />
             
             {/* Collections Pages */}
             <Route path="/validation" element={<Validation />} />

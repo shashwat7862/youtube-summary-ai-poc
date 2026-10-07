@@ -75,9 +75,9 @@ const navItems: NavItem[] = [
   // },
   {
     name: "Work List",
-    key: "tables",
+    key: "workList",
     icon: <TaskIcon fontSize={24} />,
-    path: "/basic-tables",
+    path: "/work-list",
   },
   {
     name: "Validation",

@@ -6,7 +6,7 @@ import DatePicker from "@/components/form/date-picker";
 import Label from "@/components/form/Label";
 import { CalenderIcon } from "@/icons";
 
-export default function BasicTables() {
+export default function WorkList() {
   const [activeTab, setActiveTab] = useState("today");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<string>("");

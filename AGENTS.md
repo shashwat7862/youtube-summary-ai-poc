@@ -14,7 +14,7 @@ src/
 │   ├── AuthPages/             # SignIn, SignUp, ResetPassword, TwoStepVerification
 │   ├── Ecommerce/             # ProductList, AddProduct, Billing, Invoices, Transactions…
 │   ├── Forms/                 # FormElements, FormLayout
-│   ├── Tables/                # BasicTables, DataTables
+│   ├── Tables/                # DataTables
 │   ├── Charts/                # LineChart, BarChart, PieChart, RadarChart, RadialChart
 │   ├── UiElements/            # Alerts, Badges, Buttons, Modals, Tabs, Tooltips…
 │   ├── Task/                  # TaskKanban, TaskList
