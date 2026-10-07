@@ -16,7 +16,7 @@ const LayoutContent: React.FC = () => {
       <div
         className={cn(
           "flex-1 transition-[margin] duration-300 ease-in-out flex flex-col h-full overflow-hidden",
-          isExpanded || isHovered ? "xl:ms-[248px]" : "xl:ms-16",
+          isExpanded || isHovered ? "xl:ms-[260px]" : "xl:ms-16",
           isMobileOpen ? "ms-0" : "",
         )}
       >

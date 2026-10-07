@@ -376,7 +376,7 @@ const AppSidebar: React.FC = () => {
     <aside
       className={cn(
         "fixed inset-s-0 top-0 z-50 flex h-screen flex-col border-e border-purple-700 bg-purple-900 text-white transition-all duration-300 ease-in-out xl:translate-x-0 xl:rtl:translate-x-0 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-100",
-        isExpanded || isMobileOpen ? "w-[248px] px-5" : "w-16 px-1",
+        isExpanded || isMobileOpen ? "w-[260px] px-5" : "w-16 px-1",
         isMobileOpen
           ? "translate-x-0"
           : "-translate-x-full rtl:translate-x-full",
@@ -393,7 +393,7 @@ const AppSidebar: React.FC = () => {
             CC
           </span>
           {(isExpanded || isHovered || isMobileOpen) && (
-            <span className="flex flex-col leading-tight">
+            <span className="flex flex-col leading-tight mr-4">
               <span className="bg-gradient-to-r from-white to-purple-100 bg-clip-text text-base font-bold tracking-normal text-transparent leading-tight whitespace-nowrap dark:from-brand-600 dark:to-brand-400">
                 Cash Collection Bridge
               </span>
