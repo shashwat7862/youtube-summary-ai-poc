@@ -12,6 +12,7 @@ export default function WorkList() {
   const [sortField, setSortField] = useState<string>("");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [filters, setFilters] = useState({
     validation: "all",
     failureReason: "all", 
@@ -35,12 +36,29 @@ export default function WorkList() {
 
   // Filter options
 
-  // Sample table data with phone numbers
+  // Sample table data with detailed invoice information
   const tableData = [
     {
       customer: "Univar Solutions B.V.",
       id: "180784",
-      invoice: "61635315, 61635316",
+      invoices: [
+        { 
+          number: "61635315", 
+          description: "Invoice • due 09/25 • DPD 5", 
+          amount: "NOK 75,420.25",
+          outcome: "Passed",
+          validation: "Passed",
+          failureReason: "—"
+        },
+        { 
+          number: "61635316", 
+          description: "Invoice • due 09/28 • DPD 2", 
+          amount: "NOK 72,438.50",
+          outcome: "Failed",
+          validation: "Failed", 
+          failureReason: "Payment verification failed"
+        }
+      ],
       openAmount: "NOK 147,858.75",
       worklistScore: "76",
       contact: "ORDRE_NO@univarsolutions.com",
@@ -49,12 +67,26 @@ export default function WorkList() {
       failureReason: "—",
       plannedTime: "09:40",
       callStatus: "Completed",
+      eligibilityGates: {
+        customer: { status: "failed", title: "Customer", subtitle: "A2 failed" },
+        invoices: { status: "passed", title: "Invoices", subtitle: "1 of 1" },
+        timing: { status: "passed", title: "Timing", subtitle: "Clear" }
+      },
       date: "2026-09-25"
     },
     {
       customer: "Nordic Pharma AS",
       id: "359912",
-      invoice: "61635410",
+      invoices: [
+        { 
+          number: "61635410", 
+          description: "Invoice • due 09/30 • DPD 9", 
+          amount: "NOK 22,140.00",
+          outcome: "Blocked",
+          validation: "Warning",
+          failureReason: "Insufficient credit limit"
+        }
+      ],
       openAmount: "NOK 22,140.00",
       worklistScore: "92",
       contact: "ap.nordicpharma@nordicpharma.no",
@@ -63,13 +95,35 @@ export default function WorkList() {
       failureReason: "Session creation failed after 3 attempts",
       plannedTime: "10:15",
       callStatus: "Blocked",
+      eligibilityGates: {
+        customer: { status: "passed", title: "Customer", subtitle: "A1 passed" },
+        invoices: { status: "failed", title: "Invoices", subtitle: "0 of 2" },
+        timing: { status: "passed", title: "Timing", subtitle: "Clear" }
+      },
       date: "2026-09-24"
     },
     {
       customer: "Delta",
       id: "",
-      invoice: "61635488,",
-      openAmount: "GBP",
+      invoices: [
+        { 
+          number: "61635488", 
+          description: "Invoice • due 09/20 • DPD 15", 
+          amount: "GBP 8,500.00",
+          outcome: "Passed",
+          validation: "Passed",
+          failureReason: "—"
+        },
+        { 
+          number: "61635489", 
+          description: "Invoice • due 09/22 • DPD 13", 
+          amount: "GBP 12,300.00",
+          outcome: "Passed",
+          validation: "Passed",
+          failureReason: "—"
+        }
+      ],
+      openAmount: "GBP 20,800.00",
       worklistScore: "58",
       contact: "finance@deltamedical.co.uk",
       phone: "+44 20 7123 4567",
@@ -77,6 +131,11 @@ export default function WorkList() {
       failureReason: "Missing",
       plannedTime: "11:05",
       callStatus: "Completed",
+      eligibilityGates: {
+        customer: { status: "passed", title: "Customer", subtitle: "B1 passed" },
+        invoices: { status: "passed", title: "Invoices", subtitle: "3 of 3" },
+        timing: { status: "failed", title: "Timing", subtitle: "Overdue" }
+      },
       date: "2026-09-23"
     }
   ];
@@ -92,12 +151,22 @@ export default function WorkList() {
   const filteredTableData = tableData.filter(row => {
     // Search filter
     const searchMatch = row.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      row.invoice.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      row.invoices.some(inv => 
+        inv.number.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        inv.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        inv.outcome.toLowerCase().includes(searchTerm.toLowerCase())
+      ) ||
       row.contact.toLowerCase().includes(searchTerm.toLowerCase()) ||
       row.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
       row.validation.toLowerCase().includes(searchTerm.toLowerCase()) ||
       row.failureReason.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      row.callStatus.toLowerCase().includes(searchTerm.toLowerCase());
+      row.callStatus.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      row.eligibilityGates.customer.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      row.eligibilityGates.customer.subtitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      row.eligibilityGates.invoices.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      row.eligibilityGates.invoices.subtitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      row.eligibilityGates.timing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      row.eligibilityGates.timing.subtitle.toLowerCase().includes(searchTerm.toLowerCase());
     
     // Date range filter (only apply in Archive tab)
     let dateMatch = true;
@@ -164,6 +233,85 @@ export default function WorkList() {
     }
   };
 
+  // Accordion toggle function
+  const toggleRowExpansion = (index: number) => {
+    const newExpandedRows = new Set(expandedRows);
+    if (newExpandedRows.has(index)) {
+      newExpandedRows.delete(index);
+    } else {
+      newExpandedRows.add(index);
+    }
+    setExpandedRows(newExpandedRows);
+  };
+
+  // Render accordion content
+  const renderAccordionContent = (row: any) => (
+    <tr>
+      <td colSpan={9} className="py-0">
+        <div className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+          <div className="p-6">
+            <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden max-w-5xl">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600">
+                    <th className="px-8 py-4 text-start text-sm font-medium text-gray-700 dark:text-gray-300 w-1/5">
+                      Invoice
+                    </th>
+                    <th className="px-8 py-4 text-start text-sm font-medium text-gray-700 dark:text-gray-300 w-1/5">
+                      Open amount
+                    </th>
+                    <th className="px-8 py-4 text-start text-sm font-medium text-gray-700 dark:text-gray-300 w-1/5">
+                      Validation
+                    </th>
+                    <th className="px-8 py-4 text-start text-sm font-medium text-gray-700 dark:text-gray-300 w-1/5">
+                      Failure Reason
+                    </th>
+                    <th className="px-8 py-4 text-start text-sm font-medium text-gray-700 dark:text-gray-300 w-1/5">
+                      Outcome
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {row.invoices.map((invoice: any, idx: number) => (
+                    <tr 
+                      key={idx}
+                      className="border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    >
+                      <td className="px-8 py-4 w-1/5">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          {invoice.number}
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                          {invoice.description}
+                        </div>
+                      </td>
+                      <td className="px-8 py-4 text-sm font-medium text-gray-900 dark:text-white w-1/5">
+                        {invoice.amount}
+                      </td>
+                      <td className="px-8 py-4 w-1/5">
+                        <span className={getValidationBadge(invoice.validation)}>
+                          {invoice.validation}
+                        </span>
+                      </td>
+                      <td className="px-8 py-4 text-sm text-gray-700 dark:text-gray-300 w-1/5">
+                        {invoice.failureReason}
+                      </td>
+                      <td className="px-8 py-4 w-1/5">
+                        <span className={getOutcomeBadge(invoice.outcome)}>
+                          {invoice.outcome}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+  );
+
   // Sort function
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -220,7 +368,7 @@ export default function WorkList() {
   };
 
   const getValidationBadge = (validation: string) => {
-    const baseClasses = "px-2 py-1 rounded-full text-xs font-medium";
+    const baseClasses = "px-3 py-2 rounded-full text-xs font-medium";
     switch (validation) {
       case "Passed":
         return `${baseClasses} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200`;
@@ -234,7 +382,7 @@ export default function WorkList() {
   };
 
   const getCallStatusBadge = (status: string) => {
-    const baseClasses = "px-2 py-1 rounded-full text-xs font-medium";
+    const baseClasses = "px-3 py-2 rounded-full text-xs font-medium";
     switch (status) {
       case "Completed":
         return `${baseClasses} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200`;
@@ -245,6 +393,71 @@ export default function WorkList() {
       default:
         return `${baseClasses} bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200`;
     }
+  };
+
+  const getOutcomeBadge = (outcome: string) => {
+    const baseClasses = "px-3 py-2 rounded-full text-xs font-medium";
+    switch (outcome) {
+      case "Passed":
+        return `${baseClasses} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200`;
+      case "Failed":
+        return `${baseClasses} bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200`;
+      case "Blocked":
+        return `${baseClasses} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200`;
+      default:
+        return `${baseClasses} bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200`;
+    }
+  };
+
+  const renderEligibilityGates = (gates: any) => {
+    const getGateIcon = (status: string) => {
+      if (status === "passed") {
+        return (
+          <svg className="w-3 h-3 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        );
+      } else {
+        return (
+          <svg className="w-3 h-3 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        );
+      }
+    };
+
+    const getGateClasses = (status: string) => {
+      const baseClasses = "flex items-start gap-1 px-1.5 py-1 rounded text-xs font-medium flex-1 min-w-0";
+      if (status === "passed") {
+        return `${baseClasses} bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-700`;
+      } else {
+        return `${baseClasses} bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-700`;
+      }
+    };
+
+    const renderGateContent = (gate: any) => (
+      <div className="flex flex-col leading-tight min-w-0">
+        <div className="font-medium truncate">{gate.title}</div>
+        <div className="font-normal opacity-90 truncate">{gate.subtitle}</div>
+      </div>
+    );
+
+    return (
+      <div className="flex gap-1 w-full">
+        <div className={getGateClasses(gates.customer.status)}>
+          {getGateIcon(gates.customer.status)}
+          {renderGateContent(gates.customer)}
+        </div>
+        <div className={getGateClasses(gates.invoices.status)}>
+          {getGateIcon(gates.invoices.status)}
+          {renderGateContent(gates.invoices)}
+        </div>
+        <div className={getGateClasses(gates.timing.status)}>
+          {getGateIcon(gates.timing.status)}
+          {renderGateContent(gates.timing)}
+        </div>
+      </div>
+    );
   };
 
   const renderTodayContent = () => (
@@ -443,12 +656,12 @@ export default function WorkList() {
               <table className="min-w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-gray-700">
-                    <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[120px]">
+                    <th className="text-center py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[120px]">
                       <button
                         onClick={() => handleSort("worklistScore")}
-                        className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                        className="flex items-center justify-center w-full hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
                       >
-                        <span>
+                        <span className="text-center">
                           WORKLIST<br />SCORE
                         </span>
                         {renderSortIcon("worklistScore")}
@@ -457,10 +670,10 @@ export default function WorkList() {
                     <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[180px]">
                       CUSTOMER
                     </th>
-                    <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[140px]">
-                      INVOICES
+                    <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[320px]">
+                      ELIGIBILITY GATES
                     </th>
-                    <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[120px]">
+                    <th className="text-left py-3 px-4 font-medium text-gray-700 dark:text-gray-300 min-w-[120px]">
                       OPEN AMOUNT
                     </th>
                     <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[200px]">
@@ -475,9 +688,7 @@ export default function WorkList() {
                     <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[200px]">
                       FAILURE REASON
                     </th>
-                    <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
-                      PLANNED TIME
-                    </th>
+
                     <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
                       CALL STATUS
                     </th>
@@ -485,51 +696,69 @@ export default function WorkList() {
                 </thead>
                 <tbody>
                   {sortedTableData.map((row, index) => (
-                    <tr key={index} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <td className="py-4 pl-8 pr-2 text-gray-700 dark:text-gray-300 min-w-[120px]">
-                        {row.worklistScore}
-                      </td>
-                      <td className="py-4 px-2 min-w-[180px]">
-                        <div>
-                          <div className="font-medium text-gray-900 dark:text-white">
-                            {row.customer}
+                    <>
+                      <tr 
+                        key={index} 
+                        className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                        onClick={() => toggleRowExpansion(index)}
+                      >
+                        <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[120px]">
+                          <div className="flex items-center justify-between">
+                            <svg 
+                              className={`w-4 h-4 text-gray-400 transition-transform ${expandedRows.has(index) ? 'rotate-90' : ''}`} 
+                              fill="none" 
+                              stroke="currentColor" 
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span className="font-medium text-center flex-1 -ms-4">
+                              {row.worklistScore}
+                            </span>
+                            <div className="w-4"></div>
                           </div>
-                          {row.id && (
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                              {row.id}
+                        </td>
+                        <td className="py-4 px-2 min-w-[180px]">
+                          <div>
+                            <div className="font-medium text-gray-900 dark:text-white">
+                              {row.customer}
                             </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[140px]">
-                        {row.invoice}
-                      </td>
-                      <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[120px]">
-                        {row.openAmount}
-                      </td>
-                      <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[200px]">
-                        {row.contact}
-                      </td>
-                      <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[140px]">
-                        {row.phone}
-                      </td>
-                      <td className="py-4 px-2 min-w-[100px]">
-                        <span className={getValidationBadge(row.validation)}>
-                          {row.validation}
-                        </span>
-                      </td>
-                      <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[200px]">
-                        {row.failureReason}
-                      </td>
-                      <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[100px]">
-                        {row.plannedTime}
-                      </td>
-                      <td className="py-4 px-2 min-w-[100px]">
-                        <span className={getCallStatusBadge(row.callStatus)}>
-                          {row.callStatus}
-                        </span>
-                      </td>
-                    </tr>
+                            {row.id && (
+                              <div className="text-xs text-gray-500 dark:text-gray-400">
+                                {row.id}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[320px]">
+                          {renderEligibilityGates(row.eligibilityGates)}
+                        </td>
+                        <td className="py-4 px-4 text-gray-700 dark:text-gray-300 min-w-[120px]">
+                          {row.openAmount}
+                        </td>
+                        <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[200px]">
+                          {row.contact}
+                        </td>
+                        <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[140px]">
+                          {row.phone}
+                        </td>
+                        <td className="py-4 px-2 min-w-[100px]">
+                          <span className={getValidationBadge(row.validation)}>
+                            {row.validation}
+                          </span>
+                        </td>
+                        <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[200px]">
+                          {row.failureReason}
+                        </td>
+
+                        <td className="py-4 px-2 min-w-[100px]">
+                          <span className={getCallStatusBadge(row.callStatus)}>
+                            {row.callStatus}
+                          </span>
+                        </td>
+                      </tr>
+                      {expandedRows.has(index) && renderAccordionContent(row)}
+                    </>
                   ))}
                 </tbody>
               </table>
@@ -762,12 +991,12 @@ export default function WorkList() {
               <table className="min-w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-gray-700">
-                    <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[120px]">
+                    <th className="text-center py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[120px]">
                       <button
                         onClick={() => handleSort("worklistScore")}
-                        className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                        className="flex items-center justify-center w-full hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
                       >
-                        <span>
+                        <span className="text-center">
                           WORKLIST<br />SCORE
                         </span>
                         {renderSortIcon("worklistScore")}
@@ -776,10 +1005,10 @@ export default function WorkList() {
                     <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[180px]">
                       CUSTOMER
                     </th>
-                    <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[140px]">
-                      INVOICE(S)
+                    <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[320px]">
+                      ELIGIBILITY GATES
                     </th>
-                    <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[120px]">
+                    <th className="text-left py-3 px-4 font-medium text-gray-700 dark:text-gray-300 min-w-[120px]">
                       OPEN AMOUNT
                     </th>
                     <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[200px]">
@@ -794,9 +1023,7 @@ export default function WorkList() {
                     <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[200px]">
                       FAILURE REASON
                     </th>
-                    <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
-                      PLANNED TIME
-                    </th>
+
                     <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
                       CALL STATUS
                     </th>
@@ -804,51 +1031,69 @@ export default function WorkList() {
                 </thead>
                 <tbody>
                   {sortedTableData.map((row, index) => (
-                    <tr key={index} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <td className="py-4 pl-8 pr-2 text-gray-700 dark:text-gray-300 min-w-[120px]">
-                        {row.worklistScore}
-                      </td>
-                      <td className="py-4 px-2 min-w-[180px]">
-                        <div>
-                          <div className="font-medium text-gray-900 dark:text-white">
-                            {row.customer}
+                    <>
+                      <tr 
+                        key={index} 
+                        className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                        onClick={() => toggleRowExpansion(index)}
+                      >
+                        <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[120px]">
+                          <div className="flex items-center justify-between">
+                            <svg 
+                              className={`w-4 h-4 text-gray-400 transition-transform ${expandedRows.has(index) ? 'rotate-90' : ''}`} 
+                              fill="none" 
+                              stroke="currentColor" 
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span className="font-medium text-center flex-1 -ms-4">
+                              {row.worklistScore}
+                            </span>
+                            <div className="w-4"></div>
                           </div>
-                          {row.id && (
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                              {row.id}
+                        </td>
+                        <td className="py-4 px-2 min-w-[180px]">
+                          <div>
+                            <div className="font-medium text-gray-900 dark:text-white">
+                              {row.customer}
                             </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[140px]">
-                        {row.invoice}
-                      </td>
-                      <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[120px]">
-                        {row.openAmount}
-                      </td>
-                      <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[200px]">
-                        {row.contact}
-                      </td>
-                      <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[140px]">
-                        {row.phone}
-                      </td>
-                      <td className="py-4 px-2 min-w-[100px]">
-                        <span className={getValidationBadge(row.validation)}>
-                          {row.validation}
-                        </span>
-                      </td>
-                      <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[200px]">
-                        {row.failureReason}
-                      </td>
-                      <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[100px]">
-                        {row.plannedTime}
-                      </td>
-                      <td className="py-4 px-2 min-w-[100px]">
-                        <span className={getCallStatusBadge(row.callStatus)}>
-                          {row.callStatus}
-                        </span>
-                      </td>
-                    </tr>
+                            {row.id && (
+                              <div className="text-xs text-gray-500 dark:text-gray-400">
+                                {row.id}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[320px]">
+                          {renderEligibilityGates(row.eligibilityGates)}
+                        </td>
+                        <td className="py-4 px-4 text-gray-700 dark:text-gray-300 min-w-[120px]">
+                          {row.openAmount}
+                        </td>
+                        <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[200px]">
+                          {row.contact}
+                        </td>
+                        <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[140px]">
+                          {row.phone}
+                        </td>
+                        <td className="py-4 px-2 min-w-[100px]">
+                          <span className={getValidationBadge(row.validation)}>
+                            {row.validation}
+                          </span>
+                        </td>
+                        <td className="py-4 px-2 text-gray-700 dark:text-gray-300 min-w-[200px]">
+                          {row.failureReason}
+                        </td>
+
+                        <td className="py-4 px-2 min-w-[100px]">
+                          <span className={getCallStatusBadge(row.callStatus)}>
+                            {row.callStatus}
+                          </span>
+                        </td>
+                      </tr>
+                      {expandedRows.has(index) && renderAccordionContent(row)}
+                    </>
                   ))}
                 </tbody>
               </table>
