@@ -254,20 +254,17 @@ export default function WorkList() {
               <table className="w-full">
                 <thead>
                   <tr className="bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600">
-                    <th className="px-8 py-4 text-start text-sm font-medium text-gray-700 dark:text-gray-300 w-1/5">
+                    <th className="px-8 py-4 text-start text-sm font-medium text-gray-700 dark:text-gray-300 w-1/4">
                       Invoice
                     </th>
-                    <th className="px-8 py-4 text-start text-sm font-medium text-gray-700 dark:text-gray-300 w-1/5">
+                    <th className="px-8 py-4 text-start text-sm font-medium text-gray-700 dark:text-gray-300 w-1/4">
                       Open amount
                     </th>
-                    <th className="px-8 py-4 text-start text-sm font-medium text-gray-700 dark:text-gray-300 w-1/5">
+                    <th className="px-8 py-4 text-start text-sm font-medium text-gray-700 dark:text-gray-300 w-1/4">
                       Validation
                     </th>
-                    <th className="px-8 py-4 text-start text-sm font-medium text-gray-700 dark:text-gray-300 w-1/5">
+                    <th className="px-8 py-4 text-start text-sm font-medium text-gray-700 dark:text-gray-300 w-1/4">
                       Failure Reason
-                    </th>
-                    <th className="px-8 py-4 text-start text-sm font-medium text-gray-700 dark:text-gray-300 w-1/5">
-                      Outcome
                     </th>
                   </tr>
                 </thead>
@@ -277,7 +274,7 @@ export default function WorkList() {
                       key={idx}
                       className="border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
-                      <td className="px-8 py-4 w-1/5">
+                      <td className="px-8 py-4 w-1/4">
                         <div className="text-sm font-medium text-gray-900 dark:text-white">
                           {invoice.number}
                         </div>
@@ -285,21 +282,16 @@ export default function WorkList() {
                           {invoice.description}
                         </div>
                       </td>
-                      <td className="px-8 py-4 text-sm font-medium text-gray-900 dark:text-white w-1/5">
+                      <td className="px-8 py-4 text-sm font-medium text-gray-900 dark:text-white w-1/4">
                         {invoice.amount}
                       </td>
-                      <td className="px-8 py-4 w-1/5">
+                      <td className="px-8 py-4 w-1/4">
                         <span className={getValidationBadge(invoice.validation)}>
                           {invoice.validation}
                         </span>
                       </td>
-                      <td className="px-8 py-4 text-sm text-gray-700 dark:text-gray-300 w-1/5">
+                      <td className="px-8 py-4 text-sm text-gray-700 dark:text-gray-300 w-1/4">
                         {invoice.failureReason}
-                      </td>
-                      <td className="px-8 py-4 w-1/5">
-                        <span className={getOutcomeBadge(invoice.outcome)}>
-                          {invoice.outcome}
-                        </span>
                       </td>
                     </tr>
                   ))}

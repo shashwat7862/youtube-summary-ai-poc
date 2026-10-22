@@ -6,7 +6,6 @@ import SignUp from "./pages/AuthPages/SignUp";
 import Calendar from "./pages/Calendar";
 import BarChart from "./pages/Charts/BarChart";
 import LineChart from "./pages/Charts/LineChart";
-import Home from "./pages/Dashboard/Ecommerce";
 import FormElements from "./pages/Forms/FormElements";
 import Blank from "./pages/OtherPage/Blank";
 import NotFound from "./pages/OtherPage/NotFound";
@@ -21,6 +20,9 @@ import Buttons from "./pages/UiElements/Buttons";
 import Images from "./pages/UiElements/Images";
 import Videos from "./pages/UiElements/Videos";
 import UserProfiles from "./pages/UserProfiles";
+import VideoToSummary from "./pages/VideoSummary/VideoToSummary";
+import History from "./pages/History/History";
+import Chatbot from "./pages/Chatbot/Chatbot";
 
 export default function App() {
   return (
@@ -30,7 +32,12 @@ export default function App() {
         <Routes>
           {/* Dashboard Layout */}
           <Route element={<AppLayout />}>
-            <Route index path="/" element={<Home />} />
+            <Route index path="/" element={<VideoToSummary />} />
+
+            {/* Video Summarizer Pages */}
+            <Route path="/video-to-summary" element={<VideoToSummary />} />
+            <Route path="/history" element={<History />} />
+            <Route path="/chatbot" element={<Chatbot />} />
 
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />

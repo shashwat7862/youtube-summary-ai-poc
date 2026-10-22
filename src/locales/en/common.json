@@ -20,6 +20,9 @@
       "pro": "pro"
     },
     "items": {
+      "videoToSummary": "Video to Summary",
+      "history": "History", 
+      "chatbot": "Chatbot",
       "dashboard": "Dashboard",
       "ecommerceHome": "Ecommerce",
       "analytics": "Analytics",

@@ -18,8 +18,10 @@ import {
   CallIcon,
   FilesIcon,
   TaskIcon,
-
   CheckLineIcon,
+  VideoIcon,
+  ClockIcon,
+  ChatIcon,
 } from "../icons";
 import { cn } from "../utils";
 import SidebarWidget from "./SidebarWidget";
@@ -42,67 +44,24 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  // {
-  //   icon: <GridIcon fontSize={24} />,
-  //   name: "Dashboard",
-  //   key: "dashboard",
-  //   subItems: [{ name: "Ecommerce", key: "ecommerceHome", path: "/" }],
-  // },
-  // {
-  //   icon: <CalenderIcon fontSize={24} />,
-  //   name: "Calendar",
-  //   key: "calendar",
-  //   path: "/calendar",
-  // },
-  // {
-  //   icon: <UserCircleIcon fontSize={24} />,
-  //   name: "User Profile",
-  //   key: "userProfile",
-  //   path: "/profile",
-  // },
-  // {
-  //   name: "Forms",
-  //   key: "forms",
-  //   icon: <ListIcon fontSize={24} />,
-  //   subItems: [
-  //     {
-  //       name: "Form Elements",
-  //       key: "formElements",
-  //       path: "/form-elements",
-  //       pro: false,
-  //     },
-  //   ],
-  // },
   {
-    name: "Work List",
-    key: "workList",
-    icon: <TaskIcon fontSize={24} />,
-    path: "/work-list",
+    name: "Video to Summary",
+    key: "videoToSummary",
+    icon: <VideoIcon fontSize={24} />,
+    path: "/video-to-summary",
   },
   {
-    name: "Validation",
-    key: "validation",
-    icon:  <CheckLineIcon  fontSize={24} />,
-    path: "/validation",
+    name: "History",
+    key: "history", 
+    icon: <ClockIcon fontSize={24} />,
+    path: "/history",
   },
   {
-    name: "Calls",
-    key: "calls", 
-    icon: <CallIcon fontSize={24} />,
-    path: "/calls",
+    name: "Chatbot",
+    key: "chatbot",
+    icon: <ChatIcon fontSize={24} />,
+    path: "/chatbot",
   },
-  {
-    name: "Post-Call & Exports",
-    key: "exports",
-    icon: <GridIcon fontSize={24} />,
-    path: "/exports",
-  },
-  // {
-  //   name: "Pages",
-  //   key: "pages",
-  //   icon: <PageIcon fontSize={24} />,
-  //   subItems: [{ name: "Blank Page", key: "blankPage", path: "/blank" }],
-  // },
 ];
 
 const othersItems: NavItem[] = [
@@ -395,10 +354,10 @@ const AppSidebar: React.FC = () => {
           {(isExpanded || isHovered || isMobileOpen) && (
             <span className="flex flex-col leading-tight mr-4">
               <span className="bg-gradient-to-r from-white to-purple-100 bg-clip-text text-base font-bold tracking-normal text-transparent leading-tight whitespace-nowrap dark:from-brand-600 dark:to-brand-400">
-                Cash Collection Bridge
+                Video Summerizer
               </span>
               <span className="text-[9px] font-medium tracking-wide text-purple-200 uppercase leading-tight whitespace-nowrap dark:text-gray-400">
-                GE HealthCare · Collections Ops
+                AI-Powered · Video Summarization
               </span>
             </span>
           )}
